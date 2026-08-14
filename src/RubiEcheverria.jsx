@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import rubiPic from "./assets/rubipic.jpeg";
+import CarruselAllende from "./CarruselAllende"; 
 
 /* ─── Intersection observer hook ─────────────────────────────── */
 const useInView = (threshold = 0.1) => {
@@ -48,19 +49,7 @@ const services = [
   { num: "04", title: "Broker Independiente",    desc: "Representación exclusiva de tus intereses, con acceso objetivo al portafolio más amplio del mercado nacional." },
 ];
 
-const products = [
-  { num: "01", title: "Seguro de Vida",         desc: "Protección económica para tu familia ante cualquier imprevisto. Coberturas flexibles diseñadas para tu etapa de vida." },
-  { num: "02", title: "Gastos Médicos Mayores", desc: "La mejor atención médica sin comprometer tu patrimonio. Red hospitalaria de primer nivel, cobertura nacional e internacional." },
-  { num: "03", title: "Plan de Retiro",         desc: "Construye el capital necesario para la jubilación que deseas. Rendimientos garantizados y ventajas fiscales." },
-  { num: "04", title: "Ahorro e Inversión",     desc: "Ahorro sistemático con protección de vida y rendimientos competitivos para alcanzar tus metas." },
-];
-
-const mezcalPoints = [
-  { num: "01", title: "Exportación Global",    body: "Demanda creciente en EUA, Europa y Asia. La denominación de origen mexicana tiene reconocimiento mundial." },
-  { num: "02", title: "Producción Limitada",   body: "Lotes artesanales elaborados por maestros mezcaleros con procesos tradicionales que garantizan exclusividad." },
-  { num: "03", title: "Apreciación Natural",   body: "El mezcal añejado incrementa su valor con el tiempo tanto en calidad como en el mercado de colección." },
-  { num: "04", title: "Diversificación Real",  body: "Activo tangible no correlacionado con mercados financieros. Equilibrio genuino para un portafolio robusto." },
-];
+const NAV_LINKS = [["bienes-raices","Bienes Raíces"],["provincia-allende","Provincia de Allende"],["contacto","Contacto"]];
 
 const IGIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -126,8 +115,9 @@ export default function RubiEcheverria() {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         ::selection { background: #B85C72; color: white; }
-        img { max-width: 100%; display: block; }
+        img { max-width: 100%; display: block; height: auto; }
         .s { font-family: 'Cormorant Garamond', serif; }
 
         /* ── Animaciones hero ── */
@@ -145,6 +135,10 @@ export default function RubiEcheverria() {
         .h4 { animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both; }
         .h5 { animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.7s both; }
         .hi { animation: fadeIn 1.2s ease 0.3s both; }
+
+        @media (prefers-reduced-motion: reduce) {
+          * { animation: none !important; transition: none !important; }
+        }
 
         /* ── Orbits ── */
         .orb { position:absolute; border-radius:50%; top:50%; left:50%; will-change:transform; }
@@ -169,10 +163,6 @@ export default function RubiEcheverria() {
         }
         .cbr:hover { border-top-color: #B85C72; background: #DDD0C0; }
 
-        /* ── Cards Seguros ── */
-        .cseg { transition: background 0.25s ease; cursor: default; }
-        .cseg:hover { background: rgba(184,92,114,0.06) !important; }
-
         /* ── Pill ── */
         .pill {
           position: absolute;
@@ -185,22 +175,31 @@ export default function RubiEcheverria() {
           padding: 0.85rem 1.1rem;
         }
 
+        /* ── Buttons ── */
+        button, a[role="button"] {
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+
         /* ── Nav links ── */
         .nbtn {
           background: none; border: none; cursor: pointer;
           font-size: 0.73rem; letter-spacing: 0.14em; text-transform: uppercase;
           font-family: 'DM Sans', sans-serif; font-weight: 400;
-          transition: color 0.2s ease; padding: 2px 0;
+          transition: color 0.2s ease; padding: 8px 0;
+          min-height: 44px; display: flex; align-items: center;
         }
-        .nbtn:hover { color: #B85C72 !important; }
+        .nbtn:hover, .nbtn:focus { color: #B85C72 !important; outline: none; }
+        .nbtn:focus-visible { outline: 2px solid #B85C72; outline-offset: 2px; }
 
         /* ── Topbar links ── */
         .tl {
           font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
           color: rgba(20,16,13,0.4); text-decoration: none;
           transition: color 0.2s; display: flex; align-items: center; gap: 0.35rem;
+          padding: 6px 0;
         }
-        .tl:hover { color: #B85C72; }
+        .tl:hover, .tl:focus { color: #B85C72; outline: none; }
 
         /* ── Glow ── */
         .glow { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; }
@@ -220,47 +219,56 @@ export default function RubiEcheverria() {
         .nav-inner { display: flex; align-items: center; justify-content: space-between; }
         .nav-links-desktop { display: flex; gap: 2.5rem; }
         .nav-cta-desktop { display: inline-block; }
-        .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+        .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; min-height: 44px; min-width: 44px; }
 
         @media (max-width: 768px) {
           .nav-links-desktop { display: none; }
           .nav-cta-desktop   { display: none; }
-          .nav-hamburger     { display: flex; align-items: center; }
+          .nav-hamburger     { display: flex; align-items: center; justify-content: center; }
         }
 
         /* Mobile menu overlay */
         .mobile-menu {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(20,16,13,0.97);
+          background: rgba(20,16,13,0.98);
           z-index: 200;
           display: flex; flex-direction: column;
-          align-items: center; justify-content: center; gap: 2.5rem;
+          align-items: center; justify-content: center; gap: 3rem;
           opacity: 0; pointer-events: none;
           transition: opacity 0.3s ease;
+          overflow-y: auto;
         }
         .mobile-menu.open { opacity: 1; pointer-events: all; }
         .mobile-menu button {
           background: none; border: none; cursor: pointer;
-          font-size: 1.8rem; letter-spacing: 0.08em;
+          font-size: 2.2rem; letter-spacing: 0.08em;
           font-family: 'Cormorant Garamond', serif; font-weight: 300;
-          color: rgba(245,239,232,0.5); transition: color 0.2s;
+          color: rgba(245,239,232,0.6); transition: color 0.2s;
+          min-height: 48px;
+          padding: 8px 0;
         }
-        .mobile-menu button:hover { color: #B85C72; }
+        .mobile-menu button:active { color: #B85C72; }
         .mobile-menu-close {
           position: absolute; top: 1.4rem; right: 1.4rem;
           background: none; border: none; cursor: pointer;
-          color: rgba(245,239,232,0.4); font-size: 1rem; font-family: 'DM Sans', sans-serif;
+          color: rgba(245,239,232,0.5); font-size: 0.85rem; font-family: 'DM Sans', sans-serif;
           letter-spacing: 0.1em; text-transform: uppercase;
+          padding: 8px;
+          min-height: 44px; min-width: 44px;
         }
         .mobile-menu-cta {
-          margin-top: 1rem;
+          margin-top: 1rem !important;
           font-size: 0.75rem !important;
           font-family: 'DM Sans', sans-serif !important;
           letter-spacing: 0.14em !important;
           text-transform: uppercase !important;
           color: #B85C72 !important;
           border: 1px solid rgba(184,92,114,0.4) !important;
-          padding: 0.85rem 2rem; border-radius: 2px;
+          padding: 0.95rem 2.2rem !important; 
+          border-radius: 2px;
+          min-height: 48px;
+          display: inline-flex;
+          align-items: center;
         }
 
         /* Hero layout */
@@ -275,66 +283,89 @@ export default function RubiEcheverria() {
         .sec-pad  { padding: 6rem 4rem; }
         .sec-pad-b { padding-bottom: 6rem; padding-left: 4rem; padding-right: 4rem; }
         @media (max-width: 768px) {
-          .sec-pad  { padding: 4rem 1.4rem; }
-          .sec-pad-b { padding-bottom: 4rem; padding-left: 1.4rem; padding-right: 1.4rem; }
+          .sec-pad  { padding: 3.5rem 1.4rem; }
+          .sec-pad-b { padding-bottom: 3.5rem; padding-left: 1.4rem; padding-right: 1.4rem; }
+        }
+        @media (max-width: 480px) {
+          .sec-pad  { padding: 2.5rem 1.2rem; }
+          .sec-pad-b { padding-bottom: 2.5rem; padding-left: 1.2rem; padding-right: 1.2rem; }
         }
 
         /* Header de sección */
         .sec-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: end; margin-bottom: 4rem; }
         @media (max-width: 768px) {
-          .sec-header-grid { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 3rem; }
+          .sec-header-grid { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+        }
+        @media (max-width: 480px) {
+          .sec-header-grid { margin-bottom: 2rem; }
         }
 
         /* Grid 4 servicios BR */
         .br-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; }
         @media (max-width: 900px) { .br-grid { grid-template-columns: repeat(2,1fr); } }
-        @media (max-width: 480px) { .br-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .br-grid { grid-template-columns: 1fr; gap: 0.5px; } }
 
         /* Bento BR */
         .bento-grid { display: grid; grid-template-columns: 1.55fr 1fr 1fr; gap: 1px; }
         @media (max-width: 900px) { .bento-grid { grid-template-columns: 1fr 1fr; } }
-        @media (max-width: 480px) { .bento-grid { grid-template-columns: 1fr; } }
-
-        /* Grid seguros */
-        .seg-header-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-bottom: 4rem; }
-        .seg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-        @media (max-width: 768px) {
-          .seg-header-grid { grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2.5rem; }
-          .seg-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Mezcal */
-        .mezcal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
-        .mezcal-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
-        @media (max-width: 768px) {
-          .mezcal-grid { grid-template-columns: 1fr; gap: 3rem; }
-        }
+        @media (max-width: 600px) { .bento-grid { grid-template-columns: 1fr; gap: 0.5px; } }
 
         /* Stats hero */
         .hero-stats { display: flex; gap: 3.5rem; padding-top: 2.5rem; border-top: 1px solid rgba(180,160,130,0.35); }
-        @media (max-width: 480px) { .hero-stats { gap: 2rem; } }
+        @media (max-width: 768px) { .hero-stats { gap: 2.5rem; padding-top: 2rem; } }
+        @media (max-width: 480px) { .hero-stats { gap: 1.5rem; padding-top: 1.5rem; flex-wrap: wrap; } }
 
         /* Hero padding */
         .hero-left-pad { padding: 5rem 3.5rem 5rem 4rem; }
-        @media (max-width: 768px) { .hero-left-pad { padding: 3.5rem 1.4rem 3.5rem; } }
+        @media (max-width: 768px) { .hero-left-pad { padding: 3rem 1.4rem 2.5rem; } }
+        @media (max-width: 480px) { .hero-left-pad { padding: 2rem 1.2rem 1.5rem; } }
 
         /* Divisor old money */
         .div-bar { padding: 2rem 4rem; }
         @media (max-width: 768px) { .div-bar { padding: 1.5rem 1.4rem; } }
+        @media (max-width: 480px) { .div-bar { padding: 1.2rem 1.2rem; } }
 
         /* Footer */
         .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
         @media (max-width: 768px) {
           .footer-inner { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
         }
+        @media (max-width: 480px) {
+          .footer-inner { gap: 1.2rem; }
+        }
 
         /* Contacto padding */
         .cta-pad { padding: 7rem 4rem; }
-        @media (max-width: 768px) { .cta-pad { padding: 5rem 1.4rem; } }
+        @media (max-width: 768px) { .cta-pad { padding: 4rem 1.4rem; } }
+        @media (max-width: 480px) { .cta-pad { padding: 2.5rem 1.2rem; } }
 
         /* Nav padding responsive */
         .nav-pad { padding-left: 4rem; padding-right: 4rem; }
         @media (max-width: 768px) { .nav-pad { padding-left: 1.4rem; padding-right: 1.4rem; } }
+        @media (max-width: 480px) { .nav-pad { padding-left: 1.2rem; padding-right: 1.2rem; } }
+
+        /* CTAs - Botones */
+        .cta-btn {
+          font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+          padding: 0.95rem 1.75rem;
+          border: none; cursor: pointer; border-radius: 2px;
+          font-family: 'DM Sans', sans-serif; font-weight: 500;
+          transition: all 0.2s ease;
+          min-height: 44px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          user-select: none;
+        }
+        .cta-btn:active { transform: scale(0.98); }
+        @media (max-width: 480px) {
+          .cta-btn { width: 100%; }
+        }
+
+        /* Mejoras de legibilidad móvil */
+        @media (max-width: 480px) {
+          .s { letter-spacing: -0.01em; }
+        }
       `}</style>
 
       {/* ── TOPBAR (desktop only) ──────────────────────── */}
@@ -378,15 +409,16 @@ export default function RubiEcheverria() {
 
           {/* Desktop links */}
           <div className="nav-links-desktop">
-            {[["bienes-raices","Bienes Raíces"],["seguros","Seguros"],["mezcal","Inversión"],["contacto","Contacto"]].map(([id,l])=>(
+            {NAV_LINKS.map(([id,l])=>(
               <button key={id} onClick={()=>go(id)} className="nbtn" style={{color:C.sub}}>{l}</button>
             ))}
           </div>
 
           <a href="https://wa.me/527472210906" className="nav-cta-desktop" style={{
             fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",
-            color:C.dimWhite,background:C.ink,padding:"0.68rem 1.5rem",
-            textDecoration:"none",borderRadius:"2px",fontWeight:400,transition:"background 0.2s",
+            color:C.dimWhite,background:C.ink,padding:"0.75rem 1.6rem",
+            textDecoration:"none",borderRadius:"2px",fontWeight:500,transition:"background 0.2s",
+            minHeight:"44px",display:"inline-flex",alignItems:"center",
           }}
           onMouseEnter={e=>e.target.style.background=C.rose}
           onMouseLeave={e=>e.target.style.background=C.ink}>
@@ -403,7 +435,7 @@ export default function RubiEcheverria() {
       {/* ── MOBILE MENU ──────────────────────────────────── */}
       <div className={`mobile-menu${menuOpen?" open":""}`}>
         <button className="mobile-menu-close" onClick={()=>setMenuOpen(false)}>Cerrar</button>
-        {[["inicio","Inicio"],["bienes-raices","Bienes Raíces"],["seguros","Seguros"],["mezcal","Inversión"],["contacto","Contacto"]].map(([id,l])=>(
+        {[["inicio","Inicio"],...NAV_LINKS].map(([id,l])=>(
           <button key={id} onClick={()=>go(id)}>{l}</button>
         ))}
         <a href="https://wa.me/527472210906" className="mobile-menu-cta" style={{
@@ -445,25 +477,20 @@ export default function RubiEcheverria() {
             </h1>
 
             <p className="h3" style={{fontSize:"clamp(0.85rem,1.5vw,0.95rem)",lineHeight:1.85,color:C.sub,maxWidth:380,marginBottom:"2.5rem",fontWeight:300}}>
-              Asesoría personalizada en bienes raíces, seguros e inversiones alternativas. Cada decisión, alineada a tus metas.
+              Asesoría personalizada en bienes raíces. Cada decisión, alineada a tus metas de inversión.
             </p>
 
             <div className="h4" style={{display:"flex",gap:"0.75rem",marginBottom:"3.5rem",flexWrap:"wrap"}}>
-              <button onClick={()=>go("bienes-raices")} style={{
-                fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",
-                color:C.dimWhite,background:C.ink,padding:"0.9rem 1.75rem",
-                border:"none",cursor:"pointer",borderRadius:"2px",
-                fontFamily:"'DM Sans',sans-serif",fontWeight:500,transition:"background 0.2s",
+              <button onClick={()=>go("bienes-raices")} className="cta-btn" style={{
+                color:C.dimWhite,background:C.ink,
               }}
               onMouseEnter={e=>e.target.style.background=C.rose}
               onMouseLeave={e=>e.target.style.background=C.ink}>
                 Ver Servicios
               </button>
-              <button onClick={()=>go("contacto")} style={{
-                fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",
-                color:C.sub,background:"transparent",padding:"0.9rem 1.75rem",
-                border:`1px solid ${C.borderWarm}`,cursor:"pointer",borderRadius:"2px",
-                fontFamily:"'DM Sans',sans-serif",transition:"all 0.2s",
+              <button onClick={()=>go("contacto")} className="cta-btn" style={{
+                color:C.sub,background:"transparent",
+                border:`1px solid ${C.borderWarm}`,
               }}
               onMouseEnter={e=>{e.target.style.borderColor=C.rose;e.target.style.color=C.rose}}
               onMouseLeave={e=>{e.target.style.borderColor=C.borderWarm;e.target.style.color=C.sub}}>
@@ -515,8 +542,8 @@ export default function RubiEcheverria() {
               </div>
 
               <div className="pill fa" style={{bottom:-22,right:-58,width:208}}>
-                <div style={{fontSize:"0.55rem",letterSpacing:"0.14em",textTransform:"uppercase",color:C.rose,marginBottom:"0.28rem"}}>Certificada por</div>
-                <div className="s" style={{fontSize:"0.95rem",fontWeight:400,color:C.ink,lineHeight:1.35}}>Seguros Monterrey<br/>New York Life</div>
+                <div style={{fontSize:"0.55rem",letterSpacing:"0.14em",textTransform:"uppercase",color:C.rose,marginBottom:"0.28rem"}}>Especialidad</div>
+                <div className="s" style={{fontSize:"0.95rem",fontWeight:400,color:C.ink,lineHeight:1.35}}>Bienes Raíces<br/>Comercial</div>
               </div>
 
               <div className="pill fb" style={{top:20,left:-65,width:150}}>
@@ -536,7 +563,7 @@ export default function RubiEcheverria() {
             <div style={{width:4,height:4,borderRadius:"50%",background:C.rose,opacity:0.55}}/>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:"1.5rem",flex:"0 0 auto"}}>
-            {["Bienes Raíces","◆","Seguros","◆","Inversión"].map((t,i)=>(
+            {["Bienes Raíces","◆","Estrategia","◆","Rentabilidad"].map((t,i)=>(
               <span key={i} style={{
                 fontSize: t==="◆"?"0.32rem":"0.63rem",
                 letterSpacing: t==="◆"?0:"0.2em",
@@ -586,10 +613,10 @@ export default function RubiEcheverria() {
         <div className="br-grid" style={{margin:"0 auto",maxWidth:"100%",background:C.borderWarm,marginLeft:"1.4rem",marginRight:"1.4rem"}}>
           {services.map((s,i)=>(
             <Reveal key={s.num} delay={i*0.07}>
-              <div className="cbr" style={{padding:"2.25rem 1.75rem",height:"100%",borderTop:"2px solid transparent"}}>
-                <div className="s" style={{fontSize:"3rem",fontWeight:300,color:"rgba(184,92,114,0.18)",lineHeight:1,marginBottom:"1.25rem"}}>{s.num}</div>
-                <div className="s" style={{fontSize:"1.25rem",fontWeight:400,color:C.ink,marginBottom:"0.65rem"}}>{s.title}</div>
-                <p style={{fontSize:"0.8rem",lineHeight:1.8,color:C.muted,fontWeight:300}}>{s.desc}</p>
+              <div className="cbr" style={{padding:"clamp(1.5rem, 4vw, 2.25rem) clamp(1.2rem, 3vw, 1.75rem)",height:"100%",borderTop:"2px solid transparent"}}>
+                <div className="s" style={{fontSize:"clamp(2.2rem, 5vw, 3rem)",fontWeight:300,color:"rgba(184,92,114,0.18)",lineHeight:1,marginBottom:"clamp(0.75rem, 2vw, 1.25rem)"}}>{s.num}</div>
+                <div className="s" style={{fontSize:"clamp(1rem, 2.5vw, 1.25rem)",fontWeight:400,color:C.ink,marginBottom:"0.65rem"}}>{s.title}</div>
+                <p style={{fontSize:"clamp(0.75rem, 1.8vw, 0.8rem)",lineHeight:1.8,color:C.muted,fontWeight:300}}>{s.desc}</p>
               </div>
             </Reveal>
           ))}
@@ -622,10 +649,10 @@ export default function RubiEcheverria() {
             {label:"Tipos",     value:"3",        sub:"Residencial, comercial, turismo", bg:C.rosePale},
           ].map((b,i)=>(
             <Reveal key={b.label} delay={i*0.06}>
-              <div style={{background:b.bg,padding:"2.25rem 2rem",borderBottom:`1px solid ${C.borderWarm}`}}>
-                <div style={{fontSize:"0.58rem",letterSpacing:"0.18em",textTransform:"uppercase",color:C.rose,marginBottom:"0.5rem"}}>{b.label}</div>
-                <div className="s" style={{fontSize:"2.2rem",fontWeight:300,color:C.ink,lineHeight:1,marginBottom:"0.28rem"}}>{b.value}</div>
-                <div style={{fontSize:"0.7rem",color:C.muted,fontWeight:300}}>{b.sub}</div>
+              <div style={{background:b.bg,padding:"clamp(1.5rem, 4vw, 2.25rem) clamp(1.2rem, 3vw, 2rem)",borderBottom:`1px solid ${C.borderWarm}`}}>
+                <div style={{fontSize:"clamp(0.5rem, 1.2vw, 0.58rem)",letterSpacing:"0.18em",textTransform:"uppercase",color:C.rose,marginBottom:"0.5rem"}}>{b.label}</div>
+                <div className="s" style={{fontSize:"clamp(1.8rem, 4vw, 2.2rem)",fontWeight:300,color:C.ink,lineHeight:1,marginBottom:"0.28rem"}}>{b.value}</div>
+                <div style={{fontSize:"clamp(0.65rem, 1.5vw, 0.7rem)",color:C.muted,fontWeight:300}}>{b.sub}</div>
               </div>
             </Reveal>
           ))}
@@ -637,141 +664,77 @@ export default function RubiEcheverria() {
       <div className="sdiv"/>
 
       {/* ══════════════════════════════════════════
-          SEGUROS
+          PROVINCIA DE ALLENDE
       ══════════════════════════════════════════ */}
-      <section id="seguros" style={{background:C.ink2,position:"relative",overflow:"hidden"}}>
-        <div className="glow" style={{width:420,height:420,background:"rgba(184,92,114,0.05)",top:"5%",right:"-5%"}}/>
+      <section id="provincia-allende" style={{background:C.parchment,position:"relative"}}>
+        <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(rgba(100,75,50,0.04) 1px,transparent 1px)",backgroundSize:"26px 26px",pointerEvents:"none"}}/>
 
         <div className="sec-pad-b" style={{paddingTop:"6rem",position:"relative",zIndex:1}}>
           <Reveal>
             <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.85rem"}}>
               <div style={{width:20,height:1,background:C.rose,opacity:0.55,flexShrink:0}}/>
-              <p style={{fontSize:"0.65rem",letterSpacing:"0.22em",textTransform:"uppercase",color:C.rose}}>Protección y Previsión</p>
+              <p style={{fontSize:"0.65rem",letterSpacing:"0.22em",textTransform:"uppercase",color:C.rose}}>
+                Disponible en el Catálogo de Rubí
+              </p>
             </div>
+            <h2 className="s" style={{fontSize:"clamp(2.2rem,4.5vw,4rem)",fontWeight:300,lineHeight:1.04,color:C.ink,marginBottom:"1.5rem"}}>
+              Provincia de <span style={{fontStyle:"italic",color:C.rose}}>Allende</span>
+            </h2>
+            <p style={{fontSize:"0.88rem",lineHeight:1.85,color:C.sub,maxWidth:640,fontWeight:300,marginBottom:"1.2rem"}}>
+              Un desarrollo inmobiliario de nivel mundial en San Miguel de Allende, Guanajuato — ciudad Patrimonio Cultural de la Humanidad por la UNESCO y nombrada varias veces "Mejor Ciudad Pequeña del Mundo" por Travel + Leisure y Condé Nast Traveler. Comunidad planeada bajo los principios del Nuevo Urbanismo, diseñada por Andrés Duany (DPZ CoDesign), con arquitectura de Artigas Arquitectos.
+            </p>
+            <div style={{width:32,height:1,background:C.rose,marginBottom:"3rem",opacity:0.6}}/>
           </Reveal>
 
-          <div className="seg-header-grid">
-            <Reveal delay={0.06}>
-              <h2 className="s" style={{fontSize:"clamp(2.2rem,4vw,3.8rem)",fontWeight:300,lineHeight:1.06,color:C.dimWhite}}>
-                Seguros que<br/><span style={{fontStyle:"italic",color:C.rose}}>protegen</span><br/>lo que importa
-              </h2>
-            </Reveal>
-            <Reveal delay={0.15}>
-              <p className="s" style={{fontSize:"clamp(1.2rem,2vw,1.45rem)",fontWeight:300,lineHeight:1.55,color:"rgba(245,239,232,0.5)",marginBottom:"1.4rem",fontStyle:"italic"}}>
-                "Cada familia merece un plan hecho a su medida, no un producto de catálogo."
-              </p>
-              <p style={{fontSize:"0.83rem",lineHeight:1.85,color:"rgba(245,239,232,0.34)",marginBottom:"1.75rem",fontWeight:300}}>
-                La asesoría en seguros va más allá de firmar una póliza. Se trata de entender tu situación y diseñar una estrategia de protección que evolucione contigo.
-              </p>
-              <div style={{
-                display:"inline-flex",alignItems:"center",gap:"1.1rem",
-                border:"1px solid rgba(184,92,114,0.28)",padding:"0.9rem 1.3rem",
-                borderRadius:"3px",background:"rgba(184,92,114,0.06)",
-              }}>
-                <div>
-                  <div className="s" style={{fontSize:"1rem",fontWeight:600,color:C.dimWhite,lineHeight:1.2}}>Seguros Monterrey</div>
-                  <div className="s" style={{fontSize:"0.9rem",fontWeight:300,color:"rgba(245,239,232,0.45)"}}>New York Life</div>
+          {/* GALERÍA — Provincia de Allende */}
+<Reveal delay={0.05}>
+  <div style={{ marginBottom: "3.5rem" }}>
+    <CarruselAllende />
+  </div>
+</Reveal>
+
+          <div className="bento-grid" style={{background:C.borderWarm,marginBottom:"1px"}}>
+            {[
+              {label:"Ubicación", value:"SMA, Gto",   sub:"90 min de aeropuertos QRO y BJX"},
+              {label:"Lotes",     value:"126–400 m²", sub:"Standard, Plus, Premium"},
+              {label:"Enganche",  value:"10%",        sub:"Hasta 60 meses de crédito directo"},
+              {label:"Plusvalía", value:"+15.21%",    sub:"Crecimiento anual (Grupo México Plaza)"},
+            ].map((b,i)=>(
+              <Reveal key={b.label} delay={i*0.06}>
+                <div style={{background:i%2?C.rosePale:C.linen,padding:"clamp(1.5rem, 4vw, 2.25rem) clamp(1.2rem, 3vw, 2rem)",borderBottom:`1px solid ${C.borderWarm}`}}>
+                  <div style={{fontSize:"clamp(0.5rem, 1.2vw, 0.58rem)",letterSpacing:"0.18em",textTransform:"uppercase",color:C.rose,marginBottom:"0.5rem"}}>{b.label}</div>
+                  <div className="s" style={{fontSize:"clamp(1.8rem, 4vw, 2.2rem)",fontWeight:300,color:C.ink,lineHeight:1,marginBottom:"0.28rem"}}>{b.value}</div>
+                  <div style={{fontSize:"clamp(0.65rem, 1.5vw, 0.7rem)",color:C.muted,fontWeight:300}}>{b.sub}</div>
                 </div>
-                <div style={{width:1,height:32,background:"rgba(184,92,114,0.3)"}}/>
-                <div style={{fontSize:"0.58rem",letterSpacing:"0.12em",textTransform:"uppercase",color:C.rose,lineHeight:1.5}}>Asesora<br/>Certificada</div>
-              </div>
-            </Reveal>
+              </Reveal>
+            ))}
           </div>
-        </div>
 
-        <div className="seg-grid" style={{background:"rgba(245,239,232,0.04)",margin:"0 1.4rem",position:"relative",zIndex:1}}>
-          {products.map((p,i)=>(
-            <Reveal key={p.num} delay={i*0.07}>
-              <div className="cseg" style={{
-                background:`rgba(245,239,232,${i%2===0?"0.025":"0.012"})`,
-                padding:"2.75rem 2.25rem",
-                display:"grid",gridTemplateColumns:"2.25rem 1fr",gap:"1.5rem",alignItems:"start",
-                borderLeft:`3px solid ${i%2===0?C.rose:"transparent"}`,
-              }}>
-                <div className="s" style={{fontSize:"0.95rem",color:C.rose,paddingTop:"0.2rem"}}>{p.num}</div>
-                <div>
-                  <div className="s" style={{fontSize:"1.6rem",fontWeight:400,color:C.dimWhite,marginBottom:"0.65rem",lineHeight:1.2}}>{p.title}</div>
-                  <p style={{fontSize:"0.8rem",lineHeight:1.8,color:"rgba(245,239,232,0.34)",fontWeight:300}}>{p.desc}</p>
-                </div>
+          <Reveal delay={0.1}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"2rem",marginTop:"3rem"}}>
+              <div>
+                <div className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Amenidades</div>
+                <p style={{fontSize:"0.82rem",lineHeight:2,color:C.sub,fontWeight:300}}>
+                  Acceso controlado 24/7 · Casa Club con restaurante-bar y salón de estar · Gimnasio y alberca · Kids Club · Pickleball y pádel · Ciclovía, Pet Park y asadores · Business Center
+                </p>
               </div>
-            </Reveal>
-          ))}
+              <div>
+                <div className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Seguridad Jurídica</div>
+                <p style={{fontSize:"0.82rem",lineHeight:2,color:C.sub,fontWeight:300}}>
+                  Permisos en orden del Municipio de Comonfort: uso de suelo, factibilidad ambiental, urbanización, traza de macrolotes y venta de macrolotes.
+                </p>
+              </div>
+            </div>
+            <p style={{fontSize:"0.85rem",lineHeight:1.9,color:C.sub,fontWeight:300,marginTop:"2.5rem",maxWidth:640,fontStyle:"italic",borderLeft:`2px solid ${C.rose}`,paddingLeft:"1.2rem"}}>
+              Como broker 100% independiente, Rubí te da acceso a esta oportunidad con asesoría objetiva y personalizada — representando siempre tus intereses como inversionista.
+            </p>
+          </Reveal>
         </div>
 
-        <div style={{height:"6rem"}}/>
+        <div style={{height:"3rem"}}/>
       </section>
 
       <div className="sdiv"/>
-
-      {/* ══════════════════════════════════════════
-          MEZCAL
-      ══════════════════════════════════════════ */}
-      <section id="mezcal" style={{background:C.vellum,position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(rgba(85,65,40,0.055) 1px,transparent 1px)",backgroundSize:"22px 22px",pointerEvents:"none"}}/>
-        <div className="glow" style={{width:380,height:380,background:"rgba(184,92,114,0.07)",top:"10%",right:"-5%"}}/>
-
-        <div className="sec-pad">
-          <div className="mezcal-grid" style={{position:"relative",zIndex:1}}>
-            <div>
-              <Reveal>
-                <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1.1rem"}}>
-                  <div style={{width:20,height:1,background:C.rose,opacity:0.55,flexShrink:0}}/>
-                  <p style={{fontSize:"0.65rem",letterSpacing:"0.22em",textTransform:"uppercase",color:C.rose}}>Inversión Alternativa</p>
-                </div>
-                <h2 className="s" style={{fontSize:"clamp(2.2rem,4vw,4rem)",fontWeight:300,color:C.ink,lineHeight:1.06,marginBottom:"1.4rem"}}>
-                  Mezcal artesanal:<br/>una inversión con<br/><span style={{fontStyle:"italic",color:C.rose}}>historia</span>
-                </h2>
-              </Reveal>
-
-              <Reveal delay={0.1}>
-                <div className="mezcal-stats-grid" style={{background:C.borderWarm,borderRadius:"3px",overflow:"hidden",marginBottom:"1.75rem"}}>
-                  {[["52%","Ganancias para el inversionista"],["$6,000 mxn","Inversión mínima de entrada"]].map(([v,l])=>(
-                    <div key={l} style={{background:C.ink,padding:"1.6rem 1.4rem"}}>
-                      <div className="s" style={{fontSize:"2.3rem",fontWeight:300,color:C.rose,lineHeight:1,marginBottom:"0.32rem"}}>{v}</div>
-                      <div style={{fontSize:"0.7rem",color:"rgba(245,239,232,0.36)",lineHeight:1.5,fontWeight:300}}>{l}</div>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.15}>
-                <p style={{fontSize:"0.86rem",lineHeight:1.85,color:C.sub,marginBottom:"2.25rem",fontWeight:300}}>
-                  Más allá de los instrumentos tradicionales, existe un mercado de bienes tangibles con alto potencial. El mezcal artesanal mexicano es hoy una de las inversiones alternativas con mayor crecimiento a nivel mundial.
-                </p>
-                <button onClick={()=>go("contacto")} style={{
-                  fontSize:"0.7rem",letterSpacing:"0.1em",textTransform:"uppercase",
-                  color:C.dimWhite,background:C.ink,padding:"0.9rem 1.75rem",
-                  border:"none",cursor:"pointer",borderRadius:"2px",
-                  fontFamily:"'DM Sans',sans-serif",transition:"background 0.2s",
-                }}
-                onMouseEnter={e=>e.target.style.background=C.rose}
-                onMouseLeave={e=>e.target.style.background=C.ink}>
-                  Solicitar Información
-                </button>
-              </Reveal>
-            </div>
-
-            {/* Lista puntos */}
-            <div style={{background:C.parchment,borderRadius:"3px",padding:"1.75rem 2rem",border:`1px solid ${C.borderWarm}`,alignSelf:"start"}}>
-              {mezcalPoints.map((m,i)=>(
-                <Reveal key={m.num} delay={i*0.09}>
-                  <div style={{
-                    borderTop:i===0?"none":`1px solid ${C.borderWarm}`,
-                    padding:i===0?"0 0 1.5rem":"1.5rem 0",
-                    display:"grid",gridTemplateColumns:"2.75rem 1fr",gap:"1.25rem",alignItems:"start",
-                  }}>
-                    <div className="s" style={{fontSize:"1.75rem",fontWeight:300,color:C.rose,lineHeight:1}}>{m.num}</div>
-                    <div>
-                      <div style={{fontSize:"0.83rem",fontWeight:500,color:C.ink,marginBottom:"0.32rem"}}>{m.title}</div>
-                      <div style={{fontSize:"0.78rem",color:C.muted,lineHeight:1.7,fontWeight:300}}>{m.body}</div>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ══════════════════════════════════════════
           CONTACTO
@@ -784,16 +747,16 @@ export default function RubiEcheverria() {
           <Reveal>
             <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"0.75rem",marginBottom:"0.9rem"}}>
               <div style={{width:20,height:1,background:C.rose,opacity:0.55}}/>
-              <p style={{fontSize:"0.65rem",letterSpacing:"0.22em",textTransform:"uppercase",color:C.rose}}>Primer Paso</p>
+              <p style={{fontSize:"0.65rem",letterSpacing:"0.22em",textTransform:"uppercase",color:C.rose}}>Próximo Paso</p>
               <div style={{width:20,height:1,background:C.rose,opacity:0.55}}/>
             </div>
             <h2 className="s" style={{fontSize:"clamp(2.2rem,5vw,4.8rem)",fontWeight:300,color:C.dimWhite,lineHeight:1.04,marginBottom:"1.1rem"}}>
-              Hablemos de tu<br/><span style={{fontStyle:"italic",color:C.rose}}>futuro financiero</span>
+              Hablemos de tu<br/><span style={{fontStyle:"italic",color:C.rose}}>futuro inmobiliario</span>
             </h2>
             <p style={{fontSize:"0.9rem",lineHeight:1.85,color:"rgba(245,239,232,0.34)",maxWidth:420,margin:"0 auto 2.75rem",fontWeight:300}}>
-              Sin compromisos. Una conversación de 30 minutos puede cambiar el rumbo de tu patrimonio.
+              Sin compromisos. Una conversación de 30 minutos puede abrir nuevas oportunidades.
             </p>
-            <div style={{display:"flex",justifyContent:"center",gap:"0.75rem",flexWrap:"wrap"}}>
+            <div style={{display:"flex",justifyContent:"center",gap:"0.75rem",flexWrap:"wrap",maxWidth:"600px",margin:"0 auto"}}>
               {[
                 {label:"WhatsApp",href:"https://wa.me/527472210906",    bg:"#25D366",bgH:"#128C7E",color:"white",border:"none"},
                 {label:"Llamar",  href:"tel:+527472210906",              bg:"transparent",bgH:C.dimWhite,color:"rgba(245,239,232,0.55)",border:"1px solid rgba(245,239,232,0.14)"},
@@ -801,9 +764,11 @@ export default function RubiEcheverria() {
               ].map(b=>(
                 <a key={b.label} href={b.href} style={{
                   fontSize:"0.72rem",letterSpacing:"0.1em",textTransform:"uppercase",
-                  color:b.color,background:b.bg,padding:"1rem 2rem",
+                  color:b.color,background:b.bg,padding:"1rem 1.8rem",
                   textDecoration:"none",borderRadius:"2px",fontWeight:500,
                   border:b.border,transition:"all 0.2s",
+                  minHeight:"48px",display:"inline-flex",alignItems:"center",
+                  justifyContent:"center",cursor:"pointer",
                 }}
                 onMouseEnter={e=>{e.currentTarget.style.background=b.bgH;e.currentTarget.style.color=C.ink}}
                 onMouseLeave={e=>{e.currentTarget.style.background=b.bg;e.currentTarget.style.color=b.color}}>
@@ -823,7 +788,7 @@ export default function RubiEcheverria() {
           </div>
 
           <div style={{fontSize:"0.6rem",letterSpacing:"0.07em",color:"rgba(245,239,232,0.18)",lineHeight:1.8}}>
-            Broker Independiente — Aguascalientes, México<br/>
+            Broker Inmobiliario — Aguascalientes, México<br/>
             <span style={{color:"rgba(245,239,232,0.1)"}}>rubiecheverria39@gmail.com · +52 747 221 0906</span>
           </div>
 
@@ -832,7 +797,7 @@ export default function RubiEcheverria() {
           </div>
 
           <div style={{display:"flex",gap:"1.75rem",alignItems:"center",flexWrap:"wrap"}}>
-            {[["bienes-raices","Bienes Raíces"],["seguros","Seguros"],["mezcal","Inversión"]].map(([id,l])=>(
+            {NAV_LINKS.map(([id,l])=>(
               <button key={id} onClick={()=>go(id)} style={{
                 background:"none",border:"none",cursor:"pointer",
                 fontSize:"0.62rem",letterSpacing:"0.12em",textTransform:"uppercase",
@@ -856,9 +821,10 @@ export default function RubiEcheverria() {
       {/* ── WA FLOTANTE ──────────────────────────────────── */}
       <a href="https://wa.me/527472210906" className="wa" style={{
         position:"fixed",bottom:"1.5rem",right:"1.5rem",
-        width:50,height:50,background:"#25D366",borderRadius:"50%",
+        width:56,height:56,background:"#25D366",borderRadius:"50%",
         display:"flex",alignItems:"center",justifyContent:"center",
         zIndex:199,textDecoration:"none",transition:"transform 0.2s ease",
+        boxShadow:"0 4px 20px rgba(37,211,102,0.35)",
       }}
       onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
       onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
