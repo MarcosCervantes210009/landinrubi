@@ -1,19 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import rubiPic from "./assets/rubipic.jpeg";
-import CarruselAllende from "./CarruselAllende"; 
+import CarruselAllende from "./CarruselAllende";
 
-/* ─── Intersection observer hook ─────────────────────────────── */
+/* ─── Intersection observer hook (con failsafe para bots) ─────── */
 const useInView = (threshold = 0.1) => {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Si el navegador/bot no soporta IO, mostramos todo de inmediato
+    if (!("IntersectionObserver" in window)) { setInView(true); return; }
     const obs = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) { setInView(true); obs.disconnect(); }
     }, { threshold });
     obs.observe(el);
-    return () => obs.disconnect();
+    // Red de seguridad: si en 3s nada se disparó, revelamos igual
+    const failsafe = setTimeout(() => setInView(true), 3000);
+    return () => { obs.disconnect(); clearTimeout(failsafe); };
   }, [threshold]);
   return [ref, inView];
 };
@@ -52,7 +56,7 @@ const services = [
 const NAV_LINKS = [["bienes-raices","Bienes Raíces"],["provincia-allende","Provincia de Allende"],["contacto","Contacto"]];
 
 const IGIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="2" y="2" width="20" height="20" rx="5"/>
     <circle cx="12" cy="12" r="4"/>
     <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
@@ -60,7 +64,7 @@ const IGIcon = () => (
 );
 
 const MenuIcon = ({ open }) => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
     <line x1="2" y1={open ? "10" : "5"}  x2="18" y2={open ? "10" : "5"}  stroke="currentColor" strokeWidth="1.5"
       style={{ transform: open ? "rotate(45deg)" : "none", transformOrigin: "10px 10px", transition: "all 0.3s ease" }}/>
     <line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" strokeWidth="1.5"
@@ -107,12 +111,9 @@ export default function RubiEcheverria() {
     borderRose: "rgba(184,92,114,0.14)",
   };
 
-  const px = { desktop: "4rem", mobile: "1.4rem" };
-
   return (
     <div style={{ fontFamily: "'DM Sans',sans-serif", background: C.parchment, color: C.ink, overflowX: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
         body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -264,7 +265,7 @@ export default function RubiEcheverria() {
           text-transform: uppercase !important;
           color: #B85C72 !important;
           border: 1px solid rgba(184,92,114,0.4) !important;
-          padding: 0.95rem 2.2rem !important; 
+          padding: 0.95rem 2.2rem !important;
           border-radius: 2px;
           min-height: 48px;
           display: inline-flex;
@@ -476,8 +477,8 @@ export default function RubiEcheverria() {
               con criterio.
             </h1>
 
-            <p className="h3" style={{fontSize:"clamp(0.85rem,1.5vw,0.95rem)",lineHeight:1.85,color:C.sub,maxWidth:380,marginBottom:"2.5rem",fontWeight:300}}>
-              Asesoría personalizada en bienes raíces. Cada decisión, alineada a tus metas de inversión.
+            <p className="h3" style={{fontSize:"clamp(0.85rem,1.5vw,0.95rem)",lineHeight:1.85,color:C.sub,maxWidth:430,marginBottom:"2.5rem",fontWeight:300}}>
+              Broker inmobiliario independiente en Aguascalientes. Asesoría personalizada en bienes raíces e inversión patrimonial en toda la República Mexicana.
             </p>
 
             <div className="h4" style={{display:"flex",gap:"0.75rem",marginBottom:"3.5rem",flexWrap:"wrap"}}>
@@ -529,9 +530,12 @@ export default function RubiEcheverria() {
                 position:"relative",
                 boxShadow:"0 12px 28px rgba(20,16,13,0.15)",
               }}>
-                <img 
+                <img
                   src={rubiPic}
-                  alt="Rubí Echeverría - Broker Inmobiliario"
+                  alt="Rubí Echeverría, broker inmobiliario independiente en Aguascalientes, México"
+                  width="280"
+                  height="380"
+                  fetchPriority="high"
                   style={{
                     width:"100%",
                     height:"100%",
@@ -615,7 +619,7 @@ export default function RubiEcheverria() {
             <Reveal key={s.num} delay={i*0.07}>
               <div className="cbr" style={{padding:"clamp(1.5rem, 4vw, 2.25rem) clamp(1.2rem, 3vw, 1.75rem)",height:"100%",borderTop:"2px solid transparent"}}>
                 <div className="s" style={{fontSize:"clamp(2.2rem, 5vw, 3rem)",fontWeight:300,color:"rgba(184,92,114,0.18)",lineHeight:1,marginBottom:"clamp(0.75rem, 2vw, 1.25rem)"}}>{s.num}</div>
-                <div className="s" style={{fontSize:"clamp(1rem, 2.5vw, 1.25rem)",fontWeight:400,color:C.ink,marginBottom:"0.65rem"}}>{s.title}</div>
+                <h3 className="s" style={{fontSize:"clamp(1rem, 2.5vw, 1.25rem)",fontWeight:400,color:C.ink,marginBottom:"0.65rem"}}>{s.title}</h3>
                 <p style={{fontSize:"clamp(0.75rem, 1.8vw, 0.8rem)",lineHeight:1.8,color:C.muted,fontWeight:300}}>{s.desc}</p>
               </div>
             </Reveal>
@@ -631,11 +635,11 @@ export default function RubiEcheverria() {
               position:"relative",overflow:"hidden",
             }}>
               <div style={{fontSize:"0.58rem",letterSpacing:"0.2em",textTransform:"uppercase",color:C.rose}}>Diferenciador Clave</div>
-              <div className="s" style={{position:"absolute",fontSize:"8rem",fontWeight:300,color:"rgba(245,239,232,0.03)",right:0,bottom:"-1rem",lineHeight:1,userSelect:"none"}}>BR</div>
+              <div className="s" style={{position:"absolute",fontSize:"8rem",fontWeight:300,color:"rgba(245,239,232,0.03)",right:0,bottom:"-1rem",lineHeight:1,userSelect:"none"}} aria-hidden="true">BR</div>
               <div>
-                <div className="s" style={{fontSize:"1.85rem",fontWeight:300,color:C.dimWhite,lineHeight:1.2,marginBottom:"0.75rem"}}>
+                <h3 className="s" style={{fontSize:"1.85rem",fontWeight:300,color:C.dimWhite,lineHeight:1.2,marginBottom:"0.75rem"}}>
                   Broker<br/>100% <span style={{fontStyle:"italic",color:C.rose}}>Independiente</span>
-                </div>
+                </h3>
                 <p style={{fontSize:"0.78rem",lineHeight:1.8,color:"rgba(245,239,232,0.36)",maxWidth:260,fontWeight:300}}>
                   Trabajo para ti, no para ninguna inmobiliaria. Acceso objetivo al mercado completo.
                 </p>
@@ -687,11 +691,11 @@ export default function RubiEcheverria() {
           </Reveal>
 
           {/* GALERÍA — Provincia de Allende */}
-<Reveal delay={0.05}>
-  <div style={{ marginBottom: "3.5rem" }}>
-    <CarruselAllende />
-  </div>
-</Reveal>
+          <Reveal delay={0.05}>
+            <div style={{ marginBottom: "3.5rem" }}>
+              <CarruselAllende />
+            </div>
+          </Reveal>
 
           <div className="bento-grid" style={{background:C.borderWarm,marginBottom:"1px"}}>
             {[
@@ -713,13 +717,13 @@ export default function RubiEcheverria() {
           <Reveal delay={0.1}>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"2rem",marginTop:"3rem"}}>
               <div>
-                <div className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Amenidades</div>
+                <h3 className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Amenidades</h3>
                 <p style={{fontSize:"0.82rem",lineHeight:2,color:C.sub,fontWeight:300}}>
                   Acceso controlado 24/7 · Casa Club con restaurante-bar y salón de estar · Gimnasio y alberca · Kids Club · Pickleball y pádel · Ciclovía, Pet Park y asadores · Business Center
                 </p>
               </div>
               <div>
-                <div className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Seguridad Jurídica</div>
+                <h3 className="s" style={{fontSize:"1.1rem",color:C.ink,marginBottom:"0.75rem"}}>Seguridad Jurídica</h3>
                 <p style={{fontSize:"0.82rem",lineHeight:2,color:C.sub,fontWeight:300}}>
                   Permisos en orden del Municipio de Comonfort: uso de suelo, factibilidad ambiental, urbanización, traza de macrolotes y venta de macrolotes.
                 </p>
@@ -808,7 +812,7 @@ export default function RubiEcheverria() {
                 {l}
               </button>
             ))}
-            <a href="https://instagram.com/rubi.ech" target="_blank" rel="noreferrer"
+            <a href="https://instagram.com/rubi.ech" target="_blank" rel="noreferrer" aria-label="Instagram de Rubí Echeverría"
             style={{color:"rgba(245,239,232,0.22)",textDecoration:"none",transition:"color 0.2s",display:"flex"}}
             onMouseEnter={e=>e.currentTarget.style.color=C.rose}
             onMouseLeave={e=>e.currentTarget.style.color="rgba(245,239,232,0.22)"}>
@@ -819,7 +823,7 @@ export default function RubiEcheverria() {
       </footer>
 
       {/* ── WA FLOTANTE ──────────────────────────────────── */}
-      <a href="https://wa.me/527472210906" className="wa" style={{
+      <a href="https://wa.me/527472210906" className="wa" aria-label="Contactar por WhatsApp" style={{
         position:"fixed",bottom:"1.5rem",right:"1.5rem",
         width:56,height:56,background:"#25D366",borderRadius:"50%",
         display:"flex",alignItems:"center",justifyContent:"center",
@@ -828,7 +832,7 @@ export default function RubiEcheverria() {
       }}
       onMouseEnter={e=>e.currentTarget.style.transform="scale(1.08)"}
       onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white" aria-hidden="true">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
         </svg>
       </a>

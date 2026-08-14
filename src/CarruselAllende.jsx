@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 
 /* ─────────────────────────────────────────────────────────────
@@ -25,22 +25,41 @@ import img11 from "./assets/Allende/11-kids-club.webp";
 import img12 from "./assets/Allende/12-gimnasio.webp";
 import img13 from "./assets/Allende/13-tipos-de-lotes.webp";
 
+/* Dimensiones reales del render — evitan CLS */
+const IMG_W = 1263;
+const IMG_H = 712;
+
 /* El orden no es decorativo: recorre el desarrollo desde el
-   acceso hacia adentro — accesos, casa club, amenidades, lotes. */
+   acceso hacia adentro — accesos, casa club, amenidades, lotes.
+   `alt` lleva las palabras clave completas (desarrollo + ciudad
+   + estado); `title` y `note` son el texto visible. */
 const SLIDES = [
-  { src: img01, tag: "Accesos",    title: "Acceso principal",        note: "El portal de entrada al desarrollo, al atardecer." },
-  { src: img02, tag: "Accesos",    title: "Acceso principal",        note: "Doble torre de acceso sobre el bulevar de llegada." },
-  { src: img03, tag: "Accesos",    title: "Glorieta interior",       note: "Punto de distribución hacia las privadas." },
-  { src: img04, tag: "Accesos",    title: "Bulevar peatonal",        note: "Trazo caminable bajo los principios del Nuevo Urbanismo." },
-  { src: img05, tag: "Accesos",    title: "Acceso Privada Bugambilias", note: "Entrada controlada a la primera etapa residencial." },
-  { src: img06, tag: "Casa Club",  title: "Casa Club",               note: "Corazón social de la comunidad." },
- // { src: img07, tag: "Lotes",      title: "Bugambilias",             note: "Terrenos de 126 a 400 m², desde $806,400 MXN." },
-  { src: img08, tag: "Amenidades", title: "Alberca",                 note: "Área de descanso bajo los arcos de la Casa Club." },
-  { src: img09, tag: "Amenidades", title: "Restaurante · Bar",       note: "Servicio de alimentos dentro de la Casa Club." },
-  { src: img10, tag: "Amenidades", title: "Salón de estar",          note: "Espacio de lectura y reunión para residentes." },
-  { src: img11, tag: "Amenidades", title: "Kids Club",               note: "Área supervisada para los más chicos." },
-  { src: img12, tag: "Amenidades", title: "Gimnasio",                note: "Equipado, con vista al jardín interior." },
-  { src: img13, tag: "Lotes",      title: "Tres tipos de lote",      note: "Standard, Plus y Premium.", align: "right" },
+  { src: img01, tag: "Accesos",    title: "Acceso principal",           note: "El portal de entrada al desarrollo, al atardecer.",
+    alt: "Acceso principal al desarrollo Provincia de Allende al atardecer, San Miguel de Allende, Guanajuato" },
+  { src: img02, tag: "Accesos",    title: "Acceso principal",           note: "Doble torre de acceso sobre el bulevar de llegada.",
+    alt: "Doble torre de acceso del desarrollo residencial Provincia de Allende, San Miguel de Allende" },
+  { src: img03, tag: "Accesos",    title: "Glorieta interior",          note: "Punto de distribución hacia las privadas.",
+    alt: "Glorieta interior de Provincia de Allende, comunidad planeada en San Miguel de Allende, Guanajuato" },
+  { src: img04, tag: "Accesos",    title: "Bulevar peatonal",           note: "Trazo caminable bajo los principios del Nuevo Urbanismo.",
+    alt: "Bulevar peatonal de Provincia de Allende, trazo de Nuevo Urbanismo en San Miguel de Allende" },
+  { src: img05, tag: "Accesos",    title: "Acceso Privada Bugambilias", note: "Entrada controlada a la primera etapa residencial.",
+    alt: "Acceso controlado a la Privada Bugambilias, primera etapa de lotes en Provincia de Allende" },
+  { src: img06, tag: "Casa Club",  title: "Casa Club",                  note: "Corazón social de la comunidad.",
+    alt: "Casa Club de Provincia de Allende, amenidad principal del desarrollo en San Miguel de Allende" },
+ // { src: img07, tag: "Lotes",      title: "Bugambilias",             note: "Terrenos de 126 a 400 m², desde $806,400 MXN.",
+ //   alt: "Lotes residenciales en preventa Privada Bugambilias, Provincia de Allende, San Miguel de Allende" },
+  { src: img08, tag: "Amenidades", title: "Alberca",                    note: "Área de descanso bajo los arcos de la Casa Club.",
+    alt: "Alberca de la Casa Club en Provincia de Allende, San Miguel de Allende, Guanajuato" },
+  { src: img09, tag: "Amenidades", title: "Restaurante · Bar",          note: "Servicio de alimentos dentro de la Casa Club.",
+    alt: "Restaurante y bar de la Casa Club de Provincia de Allende, San Miguel de Allende" },
+  { src: img10, tag: "Amenidades", title: "Salón de estar",             note: "Espacio de lectura y reunión para residentes.",
+    alt: "Salón de estar para residentes en la Casa Club de Provincia de Allende, San Miguel de Allende" },
+  { src: img11, tag: "Amenidades", title: "Kids Club",                  note: "Área supervisada para los más chicos.",
+    alt: "Kids Club, área infantil supervisada en Provincia de Allende, San Miguel de Allende" },
+  { src: img12, tag: "Amenidades", title: "Gimnasio",                   note: "Equipado, con vista al jardín interior.",
+    alt: "Gimnasio equipado de la Casa Club de Provincia de Allende, San Miguel de Allende, Guanajuato" },
+  { src: img13, tag: "Lotes",      title: "Tres tipos de lote",         note: "Standard, Plus y Premium.", align: "right",
+    alt: "Plano de los tres tipos de lote (Standard, Plus y Premium) de 126 a 400 m² en Provincia de Allende" },
 ];
 
 /* Paleta — misma del sitio */
@@ -59,7 +78,7 @@ const C = {
 };
 
 const Arrow = ({ dir = "next" }) => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"
     stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"
     style={{ transform: dir === "prev" ? "rotate(180deg)" : "none" }}>
     <line x1="4" y1="12" x2="19" y2="12" />
@@ -68,7 +87,7 @@ const Arrow = ({ dir = "next" }) => (
 );
 
 const CloseIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"
     stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
     <line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
   </svg>
@@ -89,6 +108,32 @@ export default function CarruselAllende() {
   const moved = useRef(false);
 
   const last = SLIDES.length - 1;
+
+  /* ── Datos estructurados de la galería (Google Imágenes) ──
+     Los src que entrega Vite ya son rutas resueltas; las
+     convertimos a URL absoluta para que schema.org sea válido. */
+  const galleryJsonLd = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ImageGallery",
+      name: "Provincia de Allende — Galería del desarrollo",
+      description:
+        "Accesos, Casa Club, amenidades y tipos de lote del desarrollo residencial Provincia de Allende en San Miguel de Allende, Guanajuato.",
+      associatedMedia: SLIDES.map((s) => ({
+        "@type": "ImageObject",
+        contentUrl: new URL(s.src, window.location.origin).href,
+        name: `${s.title} — Provincia de Allende`,
+        caption: s.alt,
+        width: IMG_W,
+        height: IMG_H,
+        contentLocation: {
+          "@type": "Place",
+          name: "San Miguel de Allende, Guanajuato, México",
+        },
+      })),
+    });
+  }, []);
 
   /* ── Medidas: ancho de tarjeta según viewport ── */
   useEffect(() => {
@@ -199,7 +244,7 @@ export default function CarruselAllende() {
         .ca-track { display: flex; align-items: center; }
         .ca-card {
           position: relative; flex: 0 0 auto;
-          aspect-ratio: 1263 / 712;
+          aspect-ratio: ${IMG_W} / ${IMG_H};
           border-radius: 3px; overflow: hidden;
           background: ${C.vellum};
           border: 1px solid ${C.borderWarm};
@@ -210,6 +255,8 @@ export default function CarruselAllende() {
           transition: opacity .55s cubic-bezier(.16,1,.3,1);
           pointer-events: none;
         }
+        /* La placa vive SIEMPRE en el DOM (para que Google lea los
+           12 textos), pero solo se ve en la tarjeta activa. */
         .ca-plate {
           position: absolute; bottom: 1rem; max-width: min(78%, 340px);
           background: rgba(237,229,216,0.96);
@@ -219,7 +266,10 @@ export default function CarruselAllende() {
           border-radius: 2px;
           padding: 0.7rem 1rem 0.75rem;
           box-shadow: 0 14px 40px rgba(20,16,13,0.18);
+          opacity: 0; pointer-events: none;
+          transition: opacity .45s cubic-bezier(.16,1,.3,1);
         }
+        .ca-card.is-active .ca-plate { opacity: 1; }
         .ca-plate.l { left: 1rem; }
         .ca-plate.r { right: 1rem; }
         .ca-btn {
@@ -240,7 +290,7 @@ export default function CarruselAllende() {
         }
         .ca-rail::-webkit-scrollbar { display: none; }
         .ca-thumb {
-          flex: 0 0 auto; width: 68px; aspect-ratio: 1263 / 712;
+          flex: 0 0 auto; width: 68px; aspect-ratio: ${IMG_W} / ${IMG_H};
           padding: 0; border: none; border-top: 2px solid transparent;
           background: none; cursor: pointer; overflow: hidden;
           opacity: .38; filter: saturate(.55);
@@ -271,7 +321,7 @@ export default function CarruselAllende() {
           .ca-btn { width: 40px; height: 40px; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .ca-track, .ca-veil, .ca-bar span { transition: none !important; }
+          .ca-track, .ca-veil, .ca-plate, .ca-bar span { transition: none !important; }
         }
       `}</style>
 
@@ -296,12 +346,10 @@ export default function CarruselAllende() {
         >
           {SLIDES.map((s, i) => {
             const active = i === index;
-            const near = Math.abs(i - index) <= 1;
             return (
               <figure
                 key={s.src}
-                className="ca-card"
-                aria-hidden={!active}
+                className={`ca-card${active ? " is-active" : ""}`}
                 onClick={() => {
                   if (moved.current) return;
                   if (active) setLightbox(true);
@@ -320,36 +368,37 @@ export default function CarruselAllende() {
               >
                 <img
                   src={s.src}
-                  alt={`${s.title} — Provincia de Allende`}
-                  loading={i < 3 ? "eager" : "lazy"}
+                  alt={s.alt}
+                  width={IMG_W}
+                  height={IMG_H}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : "auto"}
                   decoding="async"
                   draggable="false"
                 />
                 <div className="ca-veil" style={{ opacity: active ? 0 : 0.42 }} />
 
-                {active && (
-                  <figcaption className={`ca-plate ${s.align === "right" ? "r" : "l"}`}>
-                    <div style={{
-                      fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase",
-                      color: C.rose, marginBottom: "0.3rem",
-                    }}>
-                      {s.tag}
-                    </div>
-                    <div style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: "clamp(1rem, 2.4vw, 1.3rem)", fontWeight: 400,
-                      color: C.ink, lineHeight: 1.15, marginBottom: "0.25rem",
-                    }}>
-                      {s.title}
-                    </div>
-                    <div style={{
-                      fontSize: "clamp(0.64rem, 1.5vw, 0.7rem)", lineHeight: 1.55,
-                      color: C.muted, fontWeight: 300,
-                    }}>
-                      {s.note}
-                    </div>
-                  </figcaption>
-                )}
+                <figcaption className={`ca-plate ${s.align === "right" ? "r" : "l"}`}>
+                  <div style={{
+                    fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase",
+                    color: C.rose, marginBottom: "0.3rem",
+                  }}>
+                    {s.tag}
+                  </div>
+                  <div style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "clamp(1rem, 2.4vw, 1.3rem)", fontWeight: 400,
+                    color: C.ink, lineHeight: 1.15, marginBottom: "0.25rem",
+                  }}>
+                    {s.title}
+                  </div>
+                  <div style={{
+                    fontSize: "clamp(0.64rem, 1.5vw, 0.7rem)", lineHeight: 1.55,
+                    color: C.muted, fontWeight: 300,
+                  }}>
+                    {s.note}
+                  </div>
+                </figcaption>
               </figure>
             );
           })}
@@ -381,17 +430,25 @@ export default function CarruselAllende() {
       </div>
 
       {/* ── RIEL DE MINIATURAS ── */}
-      <div ref={railRef} className="ca-rail" style={{ marginTop: "1.1rem" }} role="tablist" aria-label="Galería Provincia de Allende">
+      <div ref={railRef} className="ca-rail" style={{ marginTop: "1.1rem" }} aria-label="Galería Provincia de Allende">
         {SLIDES.map((s, i) => (
           <button
             key={s.src}
             className="ca-thumb"
-            role="tab"
+            type="button"
             aria-current={i === index}
-            aria-label={s.title}
+            aria-label={`Ver ${s.title}`}
             onClick={() => goTo(i)}
           >
-            <img src={s.src} alt="" loading="lazy" decoding="async" draggable="false" />
+            <img
+              src={s.src}
+              alt=""
+              width={IMG_W}
+              height={IMG_H}
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            />
           </button>
         ))}
       </div>
@@ -403,6 +460,14 @@ export default function CarruselAllende() {
         Imágenes de carácter ilustrativo. Colores, dimensiones y materiales pueden variar.
       </p>
 
+      {/* ── DATOS ESTRUCTURADOS DE LA GALERÍA ── */}
+      {galleryJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: galleryJsonLd }}
+        />
+      )}
+
       {/* ── LIGHTBOX ── */}
       {/* El lightbox se monta en <body> con un portal: si el carrusel va
           dentro de un contenedor con transform (como <Reveal>), un
@@ -411,7 +476,7 @@ export default function CarruselAllende() {
         <div className="ca-lb" onClick={() => setLightbox(false)} role="dialog" aria-modal="true" aria-label={current.title}>
           <img
             src={current.src}
-            alt={`${current.title} — Provincia de Allende`}
+            alt={current.alt}
             onClick={(e) => e.stopPropagation()}
             style={{
               maxWidth: "min(1100px, 94vw)", maxHeight: "76vh",
