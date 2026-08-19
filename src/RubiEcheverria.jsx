@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import rubiPic from "./assets/rubipic.jpeg";
+const rubiPic = "/rubipic.jpeg";
 import CarruselAllende from "./CarruselAllende";
 
 /* ─── Intersection observer hook (con failsafe para bots) ─────── */
