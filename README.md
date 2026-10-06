@@ -1,16 +1,43 @@
-# React + Vite
+# Landing Page — React & Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[View live website →](https://landinrubi.vercel.app) · [Developer portfolio](https://mi-portafolio-xi-hazel.vercel.app)
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+A landing page project developed by Marcos Cervantes with React and Vite. The stack includes React Router, Tailwind CSS and static site generation through vite-react-ssg.
 
-## React Compiler
+## Technology
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Area | Tools |
+| --- | --- |
+| Interface | React, JavaScript, Tailwind CSS |
+| Routing | React Router |
+| Build | Vite, vite-react-ssg |
+| Code quality | ESLint |
+| Hosting | Vercel |
 
-## Expanding the ESLint configuration
+## Local development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Install a current Node.js LTS version, then run:
+
+```bash
+npm ci
+npm run dev
+```
+
+Open the local URL printed by Vite.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| npm run dev | Start development server |
+| npm run build | Generate the site with vite-react-ssg |
+| npm run preview | Preview the production build |
+| npm run lint | Run ESLint |
+
+## Español
+
+Proyecto de landing page desarrollado por **Marcos Cervantes** con **React, Vite y Tailwind CSS**. Utiliza React Router y generación estática mediante vite-react-ssg.
+
+[Ver sitio →](https://landinrubi.vercel.app)
